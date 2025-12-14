@@ -41,7 +41,7 @@ class TextBox:
 			if not(self.edit_rect.collidepoint(position[0])):
 				self.settings.delete = True
 				self.settings.prime = False
-				self.settings.calculate.pop(-1) #*********
+				#self.settings.calculate.pop(-1) #*********
 				self.settings.del_group = group
 				continue
 

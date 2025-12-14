@@ -9,6 +9,40 @@ class UserInteractions:
 		""" Handling ALL the keyboard inputs """
 		
 		if self.event.type == pygame.KEYDOWN:
+
+			self.settings.error = "Nothing"
+
+			if pygame.K_0 <= self.event.key <= pygame.K_1:
+
+				number_pressed = self.event.key - pygame.K_0
+
+				if number_pressed == 1: # TRUE
+
+					self.settings.user_input.append("1")
+
+					if (len(self.settings.calculate) > 0) and (self.settings.calculate[-1] != "^ ") and (self.settings.calculate[-1] != "or ") and (self.settings.calculate[-1] != "not("):
+				
+						self.settings.calculate.append("and ")
+						self.settings.calculate.append("True ")
+
+					else: # if one of the conditions fails then just add the input type to the list
+						self.settings.calculate.append("True ")
+
+				#  ***********************************
+					
+
+				else: # if not 1 then its 0 FALSE
+					self.settings.user_input.append("0")
+
+					if (len(self.settings.calculate) > 0) and (self.settings.calculate[-1] != "^ ") and (self.settings.calculate[-1] != "or ") and (self.settings.calculate[-1] != "not("):
+				
+						self.settings.calculate.append("and ")
+						self.settings.calculate.append("False ")
+
+					else: # if one of the conditions fails then just add the input type to the list
+						self.settings.calculate.append("False ")
+
+				#  ***********************************
 					
 			# ************************** IF ANY LETTER IS PRESSED ADD TO THE LIST ***************************************
 			if pygame.K_a <= self.event.key <= pygame.K_z:	
@@ -148,6 +182,7 @@ class UserInteractions:
 						# if the "not(" operator used before the element then delete it to
 						if self.settings.calculate[-1] == "not(":
 							self.settings.calculate.pop(-1)
+							self.settings.prime = False
 
 							if len(self.settings.calculate) >= 1:
 								# if the "and " operator used before the "not( " operator then delete it to
@@ -161,27 +196,55 @@ class UserInteractions:
 
 
 				else: # if the last element of element NOT ended with ") " then delete just the last element
-					self.settings.calculate.pop(-1)
+					if self.settings.calculate[-1] == "not(":
+						self.settings.calculate.pop(-1)
+						self.settings.prime = False
 
-					if len(self.settings.calculate) >= 1:
-						# if the "and " operator used before the deleted element then delete it to
 						if self.settings.calculate[-1] == "and ":
 							self.settings.calculate.pop(-1)
+							# Deleting the input type comes before the "and "
+							self.settings.calculate.pop(-1)
+
+							if self.settings.calculate[-1] == "and ":
+								self.settings.calculate.pop(-1)
+
+					else:
+						self.settings.calculate.pop(-1)
+
+						if len(self.settings.calculate) >= 1:
+							# if the "and " operator used before the deleted element then delete it to
+							if self.settings.calculate[-1] == "and ":
+								self.settings.calculate.pop(-1)
 
 					
-			# ************************************************************************************************************************
+			# ********************************** IF USER WANTS TO CREATE THE MAP **************************************************
 
 			#Create the map
 			elif self.event.key == pygame.K_RETURN:
 
 				if len(self.settings.inputs_entering) < 1: ### Create a new functionality for here
+					self.settings.error = "no_input_type"
+					# CLEANING
+					self.settings.cleaning.light_cleaning(self.settings)
+					
 					print("You have to enter at least one input type.")
 
 				elif self.settings.user_input[0] in self.settings.operations or self.settings.user_input[-1] in self.settings.operations: # Create a new functionality for here
+					self.settings.error = "cant_start_end"
+					# CLEANING
+					self.settings.cleaning.light_cleaning(self.settings)
 					print("The boolean equation cant start or end with or('+'), xor('^') operators")
 
 				else:
-					self.settings.generate_map = True
+					for input_index, input in enumerate(self.settings.user_input):
+						if input in self.settings.operations and self.settings.user_input[input_index + 1] in self.settings.operations:
+							self.settings.error = "next_to_next"
+							self.settings.cleaning.light_cleaning(self.settings)
+							break
+
+						if input_index == len(self.settings.user_input) - 2 or input_index == len(self.settings.user_input) - 1:
+							self.settings.generate_map = True
+							break
 
 				
 				if self.settings.prime: # If user didn't close the prime mode then close it automatically
@@ -218,23 +281,31 @@ class UserInteractions:
 
 		if self.event.type == pygame.MOUSEWHEEL:
 
+
 			# Vertical Scrolling $$$$$$$$$$$$$$$$$$$$$
 			# Scrolling to the up
-			if self.event.y > 0:
-				print("goes up")
+			if self.event.y > 0 and self.settings.cells_row[-1].bottom > 120:
+				self.settings.move_map.scroll_up()
 
 			# Scrolling to the down
-			if self.event.y < 0:
-				print("goes down")
+			if self.event.y < 0 and self.settings.cells_row[0].top < 60:
+				self.settings.move_map.scroll_down()
 
 			# Horizontal Scrolling $$$$$$$$$$$$$$$$$4
 			# Scrolling to the right
-			if self.event.x > 0:
-				print("goes right")
+			if self.event.x > 0 and self.settings.cells_column[0].left < 80:
+				self.settings.move_map.scroll_right()
 
 			# Scrolling to the left
-			if self.event.x < 0:
-				print("goes left")
+			if self.event.x < 0 and self.settings.cells_column[-1].right > 160:
+				self.settings.move_map.scroll_left()
+
+		if self.event.type == pygame.MOUSEBUTTONDOWN:
+			
+			if self.event.button == 1:
+
+				if self.settings.clear_button_rect.collidepoint(self.event.pos):
+					self.settings.cleaning.deep_cleaning(self.settings)
 
 	
 	def update(self):

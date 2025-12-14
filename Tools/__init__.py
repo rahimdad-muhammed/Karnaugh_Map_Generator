@@ -2,3 +2,7 @@ from .text_box import TextBox
 from .UserInteractions import UserInteractions
 from .dictionary_manager import DictManager
 from .map_generator import MapGenerator
+from .move_map import MoveMap
+from .you_cant import YouCant
+from .cleaning import Cleaning
+from .tutorial_table import TutorialTable
