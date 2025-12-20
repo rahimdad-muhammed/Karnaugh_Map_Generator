@@ -1,0 +1,33 @@
+import math
+
+mouse_point = (x,y)
+
+RECT -> width = 80, height = 60, topleft = (0,0)
+
+triangle_point = (RECT.topleft, RECT.bottomleft, RECT.bottomright)
+
+# I will get all the points inside the pygame.Vector2() method to able to use point1.distance_to(point2)
+
+triangle1 = (triangle_point[0], mouse_point, triangle_point[1])
+triangle2 = (triangle_point[1], mouse_point, triangle_point[2])
+triangle3 = (triangle_point[2], mouse_point, triangle_point[0])
+
+base1 = triangle_point[0].distance_to(triangle_point[1])
+base2 = triangle_point[1].distance_to(triangle_point[2])
+base3 = triangle_point[2].distance_to(triangle_point[0])
+
+slope1 = (triangle_point[1].y - triangle_point[0].y) / (triangle_point[1].x - triangle_point[0].x)
+slope2 = (triangle_point[2].y - triangle_point[1].y) / (triangle_point[2].x - triangle_point[1].x)
+slope3 = (triangle_point[0].y - triangle_point[2].y) / (triangle_point[0].x - triangle_point[2].x)
+
+slope1_per
+
+height1 = 
+
+
+
+
+
+
+
+

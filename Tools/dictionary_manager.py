@@ -3,6 +3,7 @@ from copy import deepcopy
 
 class DictManager:
 	def __init__(self, settings):
+		# getting all the settings
 		self.settings = settings
 
 	def prime_group_del(self):
@@ -14,7 +15,7 @@ class DictManager:
 	def input_values(self):
 
 		self.settings.copy_inputs_entering.clear()
-		self.settings.copy_inputs_entering = sorted(deepcopy(self.settings.inputs_entering)) ### the problem is here!!!
+		self.settings.copy_inputs_entering = sorted(deepcopy(self.settings.inputs_entering))
 		self.settings.input_value.clear()
 		self.settings.calculated = "".join(self.settings.calculate)
 

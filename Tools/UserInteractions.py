@@ -279,33 +279,179 @@ class UserInteractions:
 
 		# ------------------------------------------------ MOUSE ACTIONS --------------------------------------------------------------
 
-		if self.event.type == pygame.MOUSEWHEEL:
+		if self.event.type == pygame.MOUSEWHEEL and len(self.settings.cells_row) > 0 and len(self.settings.cells_column) > 0:
 
 
 			# Vertical Scrolling $$$$$$$$$$$$$$$$$$$$$
 			# Scrolling to the up
 			if self.event.y > 0 and self.settings.cells_row[-1].bottom > 120:
+				
 				self.settings.move_map.scroll_up()
+				
+				if self.settings.cells_row[-1].bottom < 120:
+					
+					self.settings.speed = 120 - self.settings.cells_row[-1].bottom
+					
+					self.settings.move_map.scroll_down()
+
+					self.settings.speed = 10
 
 			# Scrolling to the down
 			if self.event.y < 0 and self.settings.cells_row[0].top < 60:
+				
 				self.settings.move_map.scroll_down()
+
+				if self.settings.cells_row[0].top > 60:
+
+					self.settings.speed = self.settings.cells_row[0].top - 60
+
+					self.settings.move_map.scroll_up()
+
+					self.settings.speed = 10
 
 			# Horizontal Scrolling $$$$$$$$$$$$$$$$$4
 			# Scrolling to the right
 			if self.event.x > 0 and self.settings.cells_column[0].left < 80:
+				
 				self.settings.move_map.scroll_right()
+
+				if self.settings.cells_column[0].left > 80:
+
+					self.settings.speed = self.settings.cells_column[0].left - 80
+
+					self.settings.move_map.scroll_left()
+
+					self.settings.speed = 10
 
 			# Scrolling to the left
 			if self.event.x < 0 and self.settings.cells_column[-1].right > 160:
+				
 				self.settings.move_map.scroll_left()
+
+				if self.settings.cells_column[-1].right < 160:
+
+					self.settings.speed = 160 - self.settings.cells_column[-1].right
+
+					self.settings.move_map.scroll_right()
+
+					self.settings.speed = 10
+
+				
 
 		if self.event.type == pygame.MOUSEBUTTONDOWN:
 			
 			if self.event.button == 1:
 
+				# clear button 
 				if self.settings.clear_button_rect.collidepoint(self.event.pos):
 					self.settings.cleaning.deep_cleaning(self.settings)
+
+				# choosing format
+				elif self.settings.table_format.format_row_rect.collidepoint(self.event.pos):
+					self.settings.table_format.clicked("row", self.settings)
+					self.settings.generate_map = True
+
+				elif self.settings.table_format.format_column_rect.collidepoint(self.event.pos):
+					self.settings.table_format.clicked("column", self.settings)
+					self.settings.generate_map = True
+
+				# move the table by grabbing with mouse
+				elif len(self.settings.cells_column) > 0:
+					if self.event.pos[0] <= (self.settings.cell_start.left + self.settings.cells_column[-1].right):
+						if self.event.pos[1] <= (self.settings.cell_start.top + self.settings.cells_row[-1].bottom):
+							if self.event.pos[0] > self.settings.cell_start.left and self.event.pos[1] > self.settings.cell_start.top:
+
+								self.settings.move = True
+					
+								self.settings.previous = self.event.pos
+
+								print(f"({self.settings.cells_column[-1].right}, {self.settings.cells_row[-1].bottom})")
+
+		if self.event.type == pygame.MOUSEBUTTONUP:
+
+			self.settings.move = False
+			self.settings.speed = 10
+
+	
+		if self.event.type == pygame.MOUSEMOTION:
+
+			self.settings.mouse_pos = self.event.pos
+
+			# if mouse touching to info circle or not 
+			if self.settings.cell_start.collidepoint(self.event.pos):
+				
+				self.settings.map_generator.display_inputs(self.event.pos, 80, 60)
+				
+
+			else:
+				self.settings.triangle_column_colour = (0,0,0)
+				self.settings.triangle_row_colour = (0,0,0)
+				self.settings.display_input = "display_none"
+
+			# moving the table
+			if self.settings.move:
+				# move to the left
+				if self.event.pos[0] < self.settings.previous[0] and self.settings.cells_column[-1].right > 160:
+
+					self.settings.speed = self.settings.previous[0] - self.event.pos[0]
+
+					self.settings.move_map.scroll_left()
+					
+					self.settings.previous = (self.event.pos[0], self.settings.previous[1])
+
+					if self.settings.cells_column[-1].right < 160:
+
+						self.settings.speed = 160 - self.settings.cells_column[-1].right
+
+						self.settings.move_map.scroll_right()
+
+
+
+				# move to the right
+				if self.event.pos[0] > self.settings.previous[0] and self.settings.cells_column[0].left < 80:
+
+					self.settings.speed = self.event.pos[0] - self.settings.previous[0]
+
+					self.settings.move_map.scroll_right()
+
+					self.settings.previous = (self.event.pos[0], self.settings.previous[1])
+
+					if self.settings.cells_column[0].left > 80:
+
+						self.settings.speed = self.settings.cells_column[0].left - 80
+
+						self.settings.move_map.scroll_left()
+
+
+				# move to the down
+				if self.event.pos[1] > self.settings.previous[1] and self.settings.cells_row[0].top < 60:
+
+					self.settings.speed = self.event.pos[1] - self.settings.previous[1]
+
+					self.settings.move_map.scroll_down()
+
+					self.settings.previous = (self.settings.previous[0], self.event.pos[1])
+
+					if self.settings.cells_row[0].top > 60:
+
+						self.settings.speed = self.settings.cells_row[0].top - 60
+
+						self.settings.move_map.scroll_up()
+
+				# move to the up
+				if self.event.pos[1] < self.settings.previous[1] and self.settings.cells_row[-1].bottom > 120:
+
+					self.settings.speed = self.settings.previous[1] - self.event.pos[1]
+
+					self.settings.move_map.scroll_up()
+
+					self.settings.previous = (self.settings.previous[0], self.event.pos[1])
+
+					if self.settings.cells_row[-1].bottom < 120:
+
+						self.settings.speed = 120 - self.settings.cells_row[-1].bottom
+
+						self.settings.move_map.scroll_down()
 
 	
 	def update(self):

@@ -1,2 +1,10 @@
 __pycache__/
 *.pyc
+.venv
+bin
+include
+lib
+lib64
+venv
+pyvenv.cfg
+Archive.zip

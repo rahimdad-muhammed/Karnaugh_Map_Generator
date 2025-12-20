@@ -6,3 +6,5 @@ from .move_map import MoveMap
 from .you_cant import YouCant
 from .cleaning import Cleaning
 from .tutorial_table import TutorialTable
+from .table_format import TableFormat
+from .instrunctions import Instrunctions
